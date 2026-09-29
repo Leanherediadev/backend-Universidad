@@ -1,0 +1,15 @@
+{
+  "name": "backend-universidad",
+  "version": "1.0.0",
+  "description": "Servidor HTTP básico - Unidad 1",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "dev": "node --experimental-strip-types src/servidor.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}
