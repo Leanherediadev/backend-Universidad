@@ -1,0 +1,151 @@
+openapi: 3.2.0
+info:
+  title: API Backend Universidad
+  version: 1.0.0
+  description: >
+    API REST para procesar compras (checkout). El pedido se procesa dentro de
+    una transacción: si algún producto queda sin stock se revierte todo
+    (ROLLBACK).
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+paths:
+  /api/pedidos:
+    post:
+      summary: Procesar un checkout de compras
+      description: >
+        Crea un pedido para el usuario indicado, descuenta el stock de cada
+        producto y registra el detalle. Todo ocurre en una única transacción.
+      operationId: crearPedido
+      tags:
+        - Pedidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrearPedidoDto"
+            example:
+              usuarioId: 1
+              productosComprados:
+                - productoId: 1
+                  cantidad: 2
+                - productoId: 2
+                  cantidad: 1
+      responses:
+        "201":
+          description: Pedido creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+        "400":
+          description: Datos incompletos o inválidos, o stock insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                datosIncompletos:
+                  summary: Información incompleta
+                  value:
+                    error: Datos de entrada inválidos
+                    detalles:
+                      - usuarioId es obligatorio y debe ser un entero positivo
+                sinStock:
+                  summary: Falta de stock
+                  value:
+                    error: Stock insuficiente para el producto "Cuaderno" (id 1)
+        "422":
+          description: El usuario o algún producto referenciado no existe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: No existe el usuario con id 999
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    ProductoComprado:
+      type: object
+      required:
+        - productoId
+        - cantidad
+      properties:
+        productoId:
+          type: integer
+          minimum: 1
+          example: 1
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 2
+    CrearPedidoDto:
+      type: object
+      required:
+        - usuarioId
+        - productosComprados
+      properties:
+        usuarioId:
+          type: integer
+          minimum: 1
+          example: 1
+        productosComprados:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ProductoComprado"
+    DetallePedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        pedidoId:
+          type: integer
+          example: 1
+        productoId:
+          type: integer
+          example: 1
+        cantidad:
+          type: integer
+          example: 2
+        precioUnitario:
+          type: string
+          description: Decimal serializado como texto
+          example: "1500.50"
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        fecha:
+          type: string
+          format: date-time
+        total:
+          type: string
+          description: Decimal serializado como texto
+          example: "3001.00"
+        usuarioId:
+          type: integer
+          example: 1
+        detalles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetallePedido"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        detalles:
+          type: array
+          items:
+            type: string

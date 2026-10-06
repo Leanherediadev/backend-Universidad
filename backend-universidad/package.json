@@ -1,0 +1,33 @@
+{
+  "name": "backend-universidad",
+  "version": "2.0.0",
+  "description": "API REST con Express, Prisma ORM, PostgreSQL y Swagger - Unidad 3",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "dev": "node --experimental-strip-types --env-file-if-exists=.env src/servidor.ts",
+    "build": "tsc && node -e \"require('fs').cpSync('src/docs','dist/docs',{recursive:true})\"",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "node --experimental-strip-types --env-file-if-exists=.env prisma/seed.ts",
+    "prisma:studio": "prisma studio",
+    "test:db": "node --experimental-strip-types --env-file=.env --test test/checkout.integration.test.ts",
+    "start": "node --env-file-if-exists=.env dist/servidor.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "express": "^5.1.0",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "dotenv": "^17.0.0",
+    "prisma": "7.10.0",
+    "typescript": "^5.5.0"
+  }
+}
